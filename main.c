@@ -81,12 +81,12 @@ int main(void) {
   srand(time(NULL));
 
   InitWindow(WIN_WIDTH, WIN_HEIGHT, "RAYLIB TINKERING");
-  SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
+  //SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
   /* SetTargetFPS (FPS_FALLBACK); */
 
   InitAudioDevice();
-  Sound sound_crumple = LoadSound("./crumple.ogg");
-  Sound sound_click = LoadSound("./mouse_click.ogg");
+  Sound sound_crumple = LoadSound("./data/sound/crumple.ogg");
+  Sound sound_click = LoadSound("./data/sound/mouse_click.ogg");
 
   if (!IsWindowFocused())
     SetWindowFocused();
@@ -112,15 +112,15 @@ int main(void) {
       short last_x = i > 0 ? drawing.data[i - 1].x : 0;
       short last_y = i > 0 ? drawing.data[i - 1].y : 0;
 
-      int renderheight = GetRenderHeight();
-      if (drawing.data[i].y >= renderheight) {
-        drawing.data[i].y = renderheight;
+      int render_height = GetRenderHeight();
+      if (drawing.data[i].y >= render_height) {
+        drawing.data[i].y = render_height;
       }
 
       if (pixel_distance(x, y, last_x, last_y) > 1 &&
           pixel_distance(x, y, last_x, last_y) <= 4) {
         DrawLine(last_x, last_y, x, y, c);
-        DrawCircle(x, y, 3, c);
+        DrawCircle(x, y, 2, c);
       } else {
         DrawPixel(x, y, c);
       }
