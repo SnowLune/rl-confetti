@@ -5,17 +5,17 @@
 
 #include "raylib.h"
 
-#define WIN_SCALAR 	1
-#define WIN_WIDTH 	1024 * WIN_SCALAR
-#define WIN_HEIGHT 	768 * WIN_SCALAR
+#define WIN_SCALAR 1
+#define WIN_WIDTH 1024 * WIN_SCALAR
+#define WIN_HEIGHT 768 * WIN_SCALAR
 
-#define FPS_FALLBACK 	60
+#define FPS_FALLBACK 60
 
-#define QUIT_KEY	81
-#define DEL_KEY		261
-#define ALT_KEY_L 	342
-#define ALT_KEY_R 	346
-#define ENTER_KEY 	257
+#define QUIT_KEY 81
+#define DEL_KEY 261
+#define ALT_KEY_L 342
+#define ALT_KEY_R 346
+#define ENTER_KEY 257
 
 /* Sounds */
 #define SOUND_CLICK
@@ -77,16 +77,22 @@ Color random_color(void) {
   return c;
 }
 
+float random_pitch(unsigned char pitch_range) {
+  float pitch = ((rand() % pitch_range) + (1000 - (pitch_range / 2))) / 1000.0;
+  return pitch;
+}
+
 int main(void) {
   srand(time(NULL));
 
   InitWindow(WIN_WIDTH, WIN_HEIGHT, "RAYLIB TINKERING");
-  //SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
-  /* SetTargetFPS (FPS_FALLBACK); */
+  // SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
+  SetTargetFPS (FPS_FALLBACK);
 
   InitAudioDevice();
   Sound sound_crumple = LoadSound("./data/sound/crumple.ogg");
   Sound sound_click = LoadSound("./data/sound/mouse_click.ogg");
+  Sound sound_sparkle = LoadSound("./data/sound/sparkle.ogg");
 
   if (!IsWindowFocused())
     SetWindowFocused();
@@ -125,7 +131,7 @@ int main(void) {
         DrawPixel(x, y, c);
       }
 
-      if (rand() % 100 < 50)
+      if (rand() % 100 < 33)
         jiggle_point(&drawing.data[i], 5);
       else
         drawing.data[i].y++;
@@ -136,13 +142,17 @@ int main(void) {
       if (IsAudioDeviceReady()) {
         SetMasterVolume(1.0);
         StopSound(sound_click);
-        short pitch_range = 200; // In thousanths
-        float pitch =
-            ((rand() % pitch_range) + (1000 - (pitch_range / 2))) / 1000.0;
-        printf("%.3f\n", pitch);
-        SetSoundPitch(sound_click, pitch);
+        StopSound(sound_sparkle);
+        SetSoundPitch(sound_click, random_pitch(200));
+        SetSoundPitch(sound_sparkle, random_pitch(200));
         PlaySound(sound_click);
+	SetSoundVolume(sound_sparkle, 0.1);
+        PlaySound(sound_sparkle);
       }
+    }
+
+    if (IsMouseButtonReleased(0)) {
+      StopSound(sound_sparkle);
     }
 
     short k = GetKeyPressed();
@@ -165,6 +175,7 @@ int main(void) {
 
   UnloadSound(sound_click);
   UnloadSound(sound_crumple);
+  UnloadSound(sound_sparkle);
 
   free(drawing.data);
 
